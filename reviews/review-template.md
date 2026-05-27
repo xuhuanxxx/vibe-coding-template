@@ -4,81 +4,101 @@
 Reviewer：[姓名/工具]
 对象：[分支 / PR / commit / 文件范围 / 部署路径]
 Review 类型：[代码 / 架构 / UI / 数据 / 部署 / 安全 / 文档]
-基线：[base branch / commit / 环境 / 数据分区，如适用]
 
-## 结论
+## 0. 基线和门禁
 
-[一句话结论：发现 N 个 blocker / high / medium / low；或“未发现阻断问题，剩余风险是 …”。]
+评审范围：[业务建模 / 架构设计 / 代码实现 / 唯一真源 / 安全边界 / 产品体验 / 其他]
 
-## Findings
+评审基线：
 
-> Findings 必须放在前面，按严重程度排序。每条 finding 都必须能被当前仓库或当前命令输出复核。
+- `[commit]`：`git cat-file -t [commit]` 返回 `commit`。
+- 工作树状态：`[clean / dirty，说明未提交改动范围]`。
+- 环境或数据基线：[本地 / staging / production snapshot / 数据分区，如适用]。
 
-### F-001 [Severity] [标题]
+本轮门禁状态：
 
-状态：[open / fixed / won't fix / needs info]
-类别：[bug / regression / security / architecture / contract / performance / test gap / docs]
-Owner boundary：[应负责修复的模块、层或契约，不写具体 patch]
-
-证据：
-
-- 文件/行号：`[path:line]`
-- 命令输出：`[command] -> [关键输出]`
-- 数据样本：`[table/partition/row/sample id]`
-- 截图/页面：`[path or URL]`
-
-复现方式：
-
-```bash
-[最小复现命令，或写“静态证据即可复核”]
-```
-
-影响：
-
-[说明会导致什么实际问题：用户可见回归、数据错误、权限绕过、部署失败、契约漂移、测试盲区等。]
-
-为什么这是当前问题：
-
-[说明它违反了哪个当前契约、当前代码路径或当前运行时事实。避免使用旧报告或未来计划作为证据。]
-
-建议修复边界：
-
-[指出应在哪个 owner boundary 修复，例如 service、model contract、deployment render、UI selector contract。不要写逐行 patch 指令。]
-
-验证要求：
-
-- [修复后必须通过的测试、contract check、smoke 或数据校验。]
-
-## 无问题区域
-
-如果某些范围已检查且未发现问题，记录在这里：
-
-| 范围 | 检查方式 | 结论 |
+| 门禁 | 本次结果 | 关键输出 |
 |---|---|---|
-| [path/surface] | [manual/code/test] | [未发现问题 / 风险较低] |
-
-## 验证记录
-
-只记录本次 review 实际运行的命令，不复用旧结果。
-
-| 命令 | 结果 | 备注 |
-|---|---|---|
-| `[command]` | pass/fail/not run | [关键输出或阻塞原因] |
+| `[command]` | pass/fail/not run | `[关键输出；不能复用旧结果]` |
 
 未运行但相关的门禁：
 
-| 命令 | 未运行原因 | 剩余风险 |
+| 门禁 | 未运行原因 | 剩余风险 |
 |---|---|---|
 | `[command]` | [原因] | [风险] |
 
-## 未决问题
+## 1. 当前结论
+
+[先给当前事实结论：整体是否健康、是否有阻塞项、主要风险集中在哪里。避免只写“很好/优秀”这类无法复核的总评。]
+
+当前问题统计：
+
+| 级别 | 数量 |
+|---|---:|
+| Blocker | 0 |
+| High | 0 |
+| Medium | 0 |
+| Low | 0 |
+
+## 2. 已确认的工程基础
+
+记录已经通过本轮证据确认的健康点，避免 review 只呈现问题而丢失上下文。
+
+- [健康点]。证据：`[path:line]` / `[command -> output]`。
+- [健康点]。证据：`[path:line]` / `[command -> output]`。
+
+## 3. 当前问题
+
+> 当前问题必须能被当前文件、当前命令输出、当前数据样本或当前运行时行为复核。已修复历史问题、误报、未来理想方案不能混写成当前问题。
+
+### 3.1 [Severity] [标题]
+
+状态：[open / fixed / false positive / accepted risk / needs info]
+类别：[bug / regression / security / architecture / contract / performance / test gap / docs]
+Owner boundary：[应负责修复的模块、层或契约]
+
+**问题**：[描述当前可复核的问题。]
+
+**证据**：
+
+- `[path:line]`：[说明]
+- `[command]`：[关键输出]
+- `[data sample / URL / screenshot]`：[说明]
+
+**影响**：[说明实际风险：用户可见回归、数据错误、权限绕过、部署失败、契约漂移、测试盲区等。]
+
+**最小修复**：[解决当前问题的最小边界修复，不写逐行 patch。]
+
+**理想修复**：[更长期、更系统的方案；如果当前不需要，明确它只是维护性方向。]
+
+**实际处理**：[未处理 / 已修复 + commit / 误报原因 / 接受风险原因。]
+
+**验证要求**：
+
+- [修复后必须通过的测试、contract check、smoke 或数据校验。]
+
+## 4. 已修复历史问题和误报
+
+这一节只记录“曾被指出但当前不成立”的项，避免和当前问题混在一起。
+
+| 项 | 当前结论 | 证据 |
+|---|---|---|
+| [历史问题/误报] | [已修复 / 误报 / 接受风险] | `[path:line]` / `[command -> output]` |
+
+## 5. 剩余风险和范围外
+
+剩余风险：
+
+- [因为未运行某门禁、缺少数据量、缺少真实环境或外部凭据导致的风险。]
+
+范围外：
+
+- [本次明确没有覆盖的范围。]
+
+## 6. 未决问题
 
 - [需要产品、架构、数据 owner 或运维确认的问题；没有则写“无”。]
 
-## 范围外
+## 7. 摘要
 
-- [本次 review 明确没有覆盖的范围。]
-
-## 摘要
-
-[简短背景和 review 范围补充。不要在这里隐藏 finding；finding 必须在前面。]
+[简短背景和 review 范围补充。不要在这里隐藏 finding；当前问题必须在第 3 节。]
