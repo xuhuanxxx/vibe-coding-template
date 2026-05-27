@@ -1,0 +1,9 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+root="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+cd "$root"
+
+scripts/check-contracts
+
+echo "请在这里补充项目自己的 lint、typecheck、test、build 和 smoke 命令。"

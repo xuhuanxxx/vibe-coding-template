@@ -1,0 +1,44 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+root="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+cd "$root"
+
+required_files=(
+  "AGENTS.md"
+  "docs/README.md"
+  "docs/architecture.md"
+  "docs/constraints.md"
+  "docs/current-capabilities.md"
+  "docs/documentation-governance.md"
+  "docs/model-contract.md"
+  "docs/frontend-agent-contract.md"
+  "docs/deployment.md"
+  "docs/error-handling.md"
+  "docs/pitfalls.md"
+  "docs/adr/README.md"
+  "docs/adr/0000-template.md"
+  "docs/archive/README.md"
+  "specs/README.md"
+  "specs/spec-template.md"
+  "specs/archive/README.md"
+  "reviews/README.md"
+  "reviews/review-template.md"
+  ".vibe/project-map.md"
+  ".vibe/agent-entrypoints.md"
+  ".vibe/review-checklist.md"
+)
+
+missing=0
+for file in "${required_files[@]}"; do
+  if [[ ! -s "$file" ]]; then
+    echo "缺失或为空: $file" >&2
+    missing=1
+  fi
+done
+
+if [[ "$missing" -ne 0 ]]; then
+  exit 1
+fi
+
+echo "契约文件检查通过"
